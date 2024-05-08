@@ -1,0 +1,123 @@
+from rplidar import RPLidar
+lidar = RPLidar('/dev/ttyAMA0')
+from rplidar import RPLidar
+lidar = RPLidar('/dev/ttyUSB0')
+lidar.stop_motor()
+lidar.stop()
+from rplidar import RPLidar
+lidar = RPLidar('/dev/ttyUSB0')
+lidar.stop_motor()
+lidar.stop()
+import pygame
+pygame.init()
+joysticks = []
+for i in range(0, pygame.joystick.get_count()):
+    # create an Joystick object in our list
+    joysticks.append(pygame.joystick.Joystick(i))
+    joysticks[-1].init()
+    print ("Detected joystick "),joysticks[-1].get_name(),"'"
+    )
+from inputs import get_gamepad
+get_gamepad()
+from evdev import InputDevice, categorize, ecodes
+gamepad = InputDevice('/dev/input/event1')
+gamepad
+e = None
+for event in gamepad.read_loop():
+  e = event
+  break
+e
+e.__dict__
+type(e)
+e.__slots__
+e.type
+e.code
+e.value
+ecodes.KEY[e.code]
+e.sec
+e.usec
+e.type
+gamepad.__dict__
+gamepad.__slots__
+gamepad.path
+gamepad.fd
+gamepad.name
+gamepad.phys
+gamepad.uniq
+gamepad.version
+gamepad.ff_effects_count
+categorize(e)
+ce = _
+ce.__dict__
+ce.__slots__
+ce.event
+ce.__repr__()
+ce.__str__()
+e.__str__()
+for event in gamepad.read_loop():
+  e = event
+  break
+for event in gamepad.read_loop():
+  pass
+for event in gamepad.read_loop():
+ e = event
+ break
+e
+categorize(e)
+str(_)
+e.value
+for event in gamepad.read_loop():
+ pass
+for event in gamepad.read_loop():
+  e = event
+  break
+print(categorize(e))
+e
+e.code
+state = [0, 0]
+for event in gamepad.read_loop():
+  if event.code == 0:
+    state[0] = event.value
+  elif event.code == 3:
+    state[1] = event.value
+  print(state)
+#
+gamepad = InputDevice('/dev/input/event1')
+for event in gamepad.read_loop():
+  print(categorize(event), end = '\r')
+etypes = {}
+for event in gamepad.read_loop():
+ etypes.add(event.code)
+etypes = set()
+for event in gamepad.read_loop():
+ etypes.add(event.code)
+etypes
+evdev.events.SynEvent
+import evdev
+evdev.events.SynEvent
+for event in gamepad.read_loop():
+  if isinstance(event, evdev.events.SynEvent): continue
+  print(categorize(event), end='\r')
+for event in gamepad.read_loop():
+  print(type(event), end='\r')
+  print(type(event.event), end='\r')
+for event in gamepad.read_loop():
+  print(type(event.event), end='\r')
+some_events = []
+for event in gamepad.read_loop():
+  some_events.append(e)
+len(events)
+len(some_events)
+set([e.code for e in some_events])
+min([e.value for e in some_events])
+max([e.value for e in some_events])
+for event in gamepad.read_loop():
+ pass
+some_events = []
+for event in gamepad.read_loop():
+  some_events.append(e)
+len(some_events)
+set([e.code for e in some_events])
+max([e.value for e in some_events])
+min([e.value for e in some_events])\
+min([e.value for e in some_events])
