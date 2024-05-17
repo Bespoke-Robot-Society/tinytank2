@@ -8,13 +8,13 @@
   @version  V1.0
   @date  2016-8-10
 */
-const int IN1 = 5;
-const int IN2 = 4;
-const int ENA = 6;
+const int IN1 = 5; //yellow
+const int IN2 = 4; //orange
+const int ENA = 6; //blue
 
-const int IN3 = 8;
-const int IN4 = 7;
-const int ENB = 9;
+const int IN3 = 8; //white
+const int IN4 = 7; //green
+const int ENB = 9; //purple
 
 const char* directions[2] = {"Forward", "Reverse"};
 
@@ -63,6 +63,26 @@ void status(int motor) {
   
 }
 
+void short_status(int motor) {
+  int spd;
+  char dir; 
+  int dir_value;
+  if (motor == 1) {
+    dir = directions[motor1_dir][0];
+    dir_value = motor1_dir;
+    spd = motor1_speed; 
+  } else {
+    dir = directions[motor2_dir][0];
+    dir_value = motor2_dir;
+    spd = motor2_speed; 
+  }
+  Serial.print(motor);
+  Serial.print(dir);
+  Serial.print(spd);
+  Serial.print('\n');
+  
+}
+
 void adjust(int motor, int amt) {
   if (motor == 1) {
     amt = motor1_dir? amt: -1*amt;
@@ -83,7 +103,16 @@ void adjust(int motor, int amt) {
   }
 }
 
+char sernext() {
+  while (true) {
+    if (!Serial.available() > 0) continue;
+    return Serial.read();
+  }
+}
+
 void handleSerial() {
+  char target_dir, d1, d2, d3;
+  int target_value;
   while (Serial.available() > 0) {
     switch (Serial.read()) {
       case 'q':
@@ -107,6 +136,32 @@ void handleSerial() {
         motor2_speed = 0;
         status(1);
         status(2);
+      case 'L':
+        target_dir = sernext(); d1 = sernext(); d2 = sernext(); d3 = sernext();
+        if (target_dir != 'f' && target_dir != 'r') {
+          Serial.println("bad dir");
+          continue;
+        }
+        target_value = (d1 - '0') * 100 + (d2 - '0') * 10 + (d3 - '0');
+        if (target_dir == 'f')      { Motor1_Forward(target_value); }
+        else if (target_dir == 'r') { Motor1_Backward(target_value); }
+        motor1_dir = (target_dir == 'f') ? 0 : 1;
+        motor1_speed = target_value;
+        short_status(1);
+        break;
+      case 'R':
+        target_dir = sernext(); d1 = sernext(); d2 = sernext(); d3 = sernext();
+        if (target_dir != 'f' && target_dir != 'r') {
+          Serial.println("bad dir");
+          continue;
+        }
+        target_value = (d1 - '0') * 100 + (d2 - '0') * 10 + (d3 - '0');
+        if (target_dir == 'f')      { Motor2_Forward(target_value); }
+        else if (target_dir == 'r') { Motor2_Backward(target_value); }
+        motor2_dir = (target_dir == 'f') ? 0 : 1;
+        motor2_speed = target_value;
+        short_status(2);
+        break;
       default:
         break;
     }
@@ -165,7 +220,7 @@ void loop() {
   } else if (motor2_dir == 1) {
     Motor2_Backward(motor2_speed);
   } else if (motor2_dir == 0) {
-    Motor1_Forward(motor2_speed);
+    Motor2_Forward(motor2_speed);
   }
 
   
