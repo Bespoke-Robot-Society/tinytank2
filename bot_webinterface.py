@@ -115,6 +115,40 @@ def motors():
         return jsonify({"success": False, "message": str(e)})
     return jsonify({"success": True, "message": ""})
 
+class Servo:
+    def __init__(self, name, serial_prefix, min_angle=0, max_angle=180):
+        self.name = name
+        self.serial_prefix = serial_prefix
+        self.min_angle = min_angle
+        self.max_angle = max_angle
+        self.angle = (self.max_angle - self.min_angle) / 2 + self.min_angle
+        self.set()
+
+    def __repr__(self):
+        return f"<Servo name={self.name} serial_prefix={self.serial_prefix} range=({self.min_angle}, {self.max_angle}) angle={self.angle}>"
+
+    @property
+    def range(self):
+        return (self.min_angle, self.max_angle)
+
+    @property
+    def angle(self):
+        return self._angle
+
+    @angle.setter
+    def angle(self, value):
+        if value < self.min_angle or value > self.max_angle:
+            raise ValueError(f"angle must be between {self.min_angle} and {self.max_angle}.")
+        self._angle = int(value)
+
+    def set(self, *, direction="forward", speed=0):
+        self.direction = direction
+        self.speed = speed
+        #command = ("L" if axis == 1 else "R") + ("r" if forward else "f") + motor_speed.zfill(3)
+        command = self.serial_prefix + str(self.angle).zfill(3)
+
+        ser.write(command.encode('utf_8'))
+
 ### LIDAR hardware-dependent section
 try:
     from rplidar_tests import lidar, get_some_scans
