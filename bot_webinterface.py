@@ -141,13 +141,40 @@ class Servo:
             raise ValueError(f"angle must be between {self.min_angle} and {self.max_angle}.")
         self._angle = int(value)
 
-    def set(self, *, direction="forward", speed=0):
-        self.direction = direction
-        self.speed = speed
-        #command = ("L" if axis == 1 else "R") + ("r" if forward else "f") + motor_speed.zfill(3)
+    def set(self, *, angle=0):
+        self.angle = angle
         command = self.serial_prefix + str(self.angle).zfill(3)
-
         ser.write(command.encode('utf_8'))
+
+pan_servo = Servo("pan", "P")
+tilt_servo = Servo("tilt", "T")
+
+@app.route('/servos', methods=['GET', 'POST'])
+def motors():
+    if request.method == 'GET':
+        return jsonify({"pan":  {"angle": pan_servo.angle}, 
+                        "tilt": {"angle": tilt_servo.angle}
+                       })
+    try:
+        data = request.json
+        print(data)
+    except:
+        return jsonify({"success": False, "message": "Could not decode JSON data in POST request"})
+    pan_settings = data.get("left", {})
+    tilt_settings = data.get("right", {})
+    pan_angle = pan_settings.get("angle", pan_servo.angle)
+    tilt_angle = tilt_settings.get("angle", tilt_servo.angle)
+    
+    try:
+        print(pan_servo)
+        print(pan_settings)
+        print(tilt_servo)
+        print(tilt_settings)
+        if pan_settings: pan_servo.set(pan_angle)
+        if tilt_settings: tilt_servo.set(tilt_angle)
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)})
+    return jsonify({"success": True, "message": ""})
 
 ### LIDAR hardware-dependent section
 try:
