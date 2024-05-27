@@ -4,7 +4,6 @@ from picamera2 import Picamera2
 import cv2
 import threading
 import time
-from rplidar_tests import lidar, get_some_scans
 
 ### You can donate at https://www.buymeacoffee.com/mmshilleh 
 
@@ -19,7 +18,7 @@ camera.start()
 def generate_frames():
     while True:
         try:
-            frame = camera.capture_array()
+            frame = cv2.cvtColor(camera.capture_array(), cv2.COLOR_BGR2RGB)
             ret, buffer = cv2.imencode('.jpg', frame)
             frame = buffer.tobytes()
         except Exception as e:
@@ -116,33 +115,40 @@ def motors():
         return jsonify({"success": False, "message": str(e)})
     return jsonify({"success": True, "message": ""})
 
-lidar_task = None
-lidar_data = None
+### LIDAR hardware-dependent section
+try:
+    from rplidar_tests import lidar, get_some_scans
+    lidar_task = None
+    lidar_data = None
 
-def scan_worker(scan_points):
-    global lidar_data
-    lidar_data = get_some_scans(scan_points)
+    def scan_worker(scan_points):
+        global lidar_data
+        lidar_data = get_some_scans(scan_points)
 
-def start_scan(scan_points):
-    global lidar_task
-    global lidar_data
-    lidar_task = threading.Thread(target=lambda: scan_worker(scan_points))
-    lidar_task.start()
+    def start_scan(scan_points):
+        global lidar_task
+        global lidar_data
+        lidar_task = threading.Thread(target=lambda: scan_worker(scan_points))
+        lidar_task.start()
 
-@app.route('/lidar')
-def lidar():
-    global lidar_task
-    global lidar_data
-    if lidar_task is None:
-        start_scan(100)
-        return jsonify({"status": "started"})
-    elif lidar_task.is_alive():
-        return jsonify({"status": "underway"})
-    else:
-        lidar_task = None
-        prev_data = lidar_data
-        lidar_data = None
-        return jsonify(prev_data)
+    @app.route('/lidar')
+    def lidar():
+        global lidar_task
+        global lidar_data
+        if lidar_task is None:
+            start_scan(100)
+            return jsonify({"status": "started"})
+        elif lidar_task.is_alive():
+            return jsonify({"status": "underway"})
+        else:
+            lidar_task = None
+            prev_data = lidar_data
+            lidar_data = None
+            return jsonify(prev_data)
+except Exception as e:
+    @app.route('/lidar')
+    def lidar():
+        return jsonify({"status": "feature_unavailable"})
 
 @app.route('/')
 def root():
