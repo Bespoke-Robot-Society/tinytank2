@@ -37,7 +37,7 @@ with open("error.jpg", "rb") as f:
     error_content = f.read()
 
 from time import sleep
-def generate_cv2frames(dev="/dev/video0"):
+def generate_cv2frames(dev="/dev/video0", rotate = False):
     cap = cv2.VideoCapture(dev)
     error_count = 0
     while True:
@@ -53,6 +53,8 @@ def generate_cv2frames(dev="/dev/video0"):
                 sleep(0.2)
                 continue
             error_count = 0 # reset on good frame
+            if rotate:
+                frame0 = cv2.rotate(frame0, cv.ROTATE_180)
             frame = cv2.cvtColor(frame0, cv2.COLOR_BGR2RGB)
             ret, buffer = cv2.imencode('.jpg', frame)
             frame = buffer.tobytes()
@@ -77,8 +79,13 @@ def generate_cv2frames(dev="/dev/video0"):
 #                    mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/video<n>')
-def video0_feed(n):
+def video_feed(n):
     return Response(generate_cv2frames(f"/dev/video{n}"),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/video<n>/rotate')
+def video_feed_rotated(n):
+    return Response(generate_cv2frames(f"/dev/video{n}", rotate=True),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 # Motor config
