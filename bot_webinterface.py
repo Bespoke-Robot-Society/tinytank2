@@ -15,6 +15,11 @@ camera.configure(camera.create_preview_configuration(main={"format": 'XRGB8888',
 camera.camera_controls["AwbEnable"] = True
 camera.start()
 
+#camera2 = Picamera2()
+#camera2.configure(camera2.create_preview_configuration(main={"device": "/dev/video1", "format": "XRGB8888", "size": (1280, 720)}))
+#camera2.camera_controls["AwbEnable"] = True
+#camera2.start()
+
 def generate_frames():
     while True:
         try:
@@ -28,9 +33,37 @@ def generate_frames():
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
         # TODO - sleep for duration needed to cap framerate at ~20fps; add timestamp to image (?)
 
+from time import sleep
+def generate_cv2frames(dev="/dev/video0"):
+    cap = cv2.VideoCapture(dev)
+    while True:
+        try:
+            ret, frame0 = cap.read()
+            if not ret: 
+                print("cv2 read error", ret, frame0)
+                sleep(0.2)
+                continue
+            frame = cv2.cvtColor(frame0, cv2.COLOR_BGR2RGB)
+            ret, buffer = cv2.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+        except Exception as e:
+            print(e)
+            continue
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 @app.route('/video')
 def video_feed():
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/video0')
+def video0_feed():
+    return Response(generate_cv2frames("/dev/video0"),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/video1')
+def video1_feed():
+    return Response(generate_cv2frames("/dev/video1"),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
 
 # Motor config
 
