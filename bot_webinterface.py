@@ -36,9 +36,14 @@ CORS(app)
 with open("error.jpg", "rb") as f:
     error_content = f.read()
 
+video_devices = {}
+
 from time import sleep
 def generate_cv2frames(dev="/dev/video0", rotate = False):
-    cap = cv2.VideoCapture(dev)
+    if dev in video_devices:
+        cap = video_devices[dev]
+    else:
+        cap = cv2.VideoCapture(dev)
     error_count = 0
     while True:
         try:
