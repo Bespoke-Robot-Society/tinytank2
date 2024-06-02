@@ -54,7 +54,7 @@ def generate_cv2frames(dev="/dev/video0", rotate = False):
                 continue
             error_count = 0 # reset on good frame
             if rotate:
-                frame0 = cv2.rotate(frame0, cv.ROTATE_180)
+                frame0 = cv2.rotate(frame0, cv2.ROTATE_180)
             frame = cv2.cvtColor(frame0, cv2.COLOR_BGR2RGB)
             ret, buffer = cv2.imencode('.jpg', frame)
             frame = buffer.tobytes()
