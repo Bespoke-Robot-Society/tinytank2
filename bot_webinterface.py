@@ -83,7 +83,7 @@ def video_feed(n):
     return Response(generate_cv2frames(f"/dev/video{n}"),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
-@app.route('/video<n>/rotate')
+@app.route('/rotatevideo<n>')
 def video_feed_rotated(n):
     return Response(generate_cv2frames(f"/dev/video{n}", rotate=True),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
