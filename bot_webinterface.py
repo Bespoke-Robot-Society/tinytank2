@@ -1,6 +1,6 @@
 from flask import Flask, Response, redirect, jsonify, request
 from flask_cors import CORS
-from picamera2 import Picamera2
+#from picamera2 import Picamera2
 import cv2
 import threading
 import time
