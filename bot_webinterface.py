@@ -150,7 +150,7 @@ pan_servo = Servo("pan", "P")
 tilt_servo = Servo("tilt", "T")
 
 @app.route('/servos', methods=['GET', 'POST'])
-def motors():
+def servos():
     if request.method == 'GET':
         return jsonify({"pan":  {"angle": pan_servo.angle}, 
                         "tilt": {"angle": tilt_servo.angle}
