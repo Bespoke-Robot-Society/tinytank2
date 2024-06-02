@@ -160,8 +160,8 @@ def servos():
         print(data)
     except:
         return jsonify({"success": False, "message": "Could not decode JSON data in POST request"})
-    pan_settings = data.get("left", {})
-    tilt_settings = data.get("right", {})
+    pan_settings = data.get("pan", {})
+    tilt_settings = data.get("tilt", {})
     pan_angle = pan_settings.get("angle", pan_servo.angle)
     tilt_angle = tilt_settings.get("angle", tilt_servo.angle)
     
