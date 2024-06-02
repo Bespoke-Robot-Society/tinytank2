@@ -170,8 +170,8 @@ def servos():
         print(pan_settings)
         print(tilt_servo)
         print(tilt_settings)
-        if pan_settings: pan_servo.set(pan_angle)
-        if tilt_settings: tilt_servo.set(tilt_angle)
+        if pan_settings: pan_servo.set(angle=pan_angle)
+        if tilt_settings: tilt_servo.set(angle=tilt_angle)
     except Exception as e:
         return jsonify({"success": False, "message": str(e)})
     return jsonify({"success": True, "message": ""})
