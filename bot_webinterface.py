@@ -10,28 +10,28 @@ import time
 app = Flask(__name__)
 CORS(app)
 
-camera = Picamera2()
-camera.configure(camera.create_preview_configuration(main={"format": 'XRGB8888', "size": (1280, 720)}))
-camera.camera_controls["AwbEnable"] = True
-camera.start()
-
-#camera2 = Picamera2()
-#camera2.configure(camera2.create_preview_configuration(main={"device": "/dev/video1", "format": "XRGB8888", "size": (1280, 720)}))
-#camera2.camera_controls["AwbEnable"] = True
-#camera2.start()
-
-def generate_frames():
-    while True:
-        try:
-            frame = cv2.cvtColor(camera.capture_array(), cv2.COLOR_BGR2RGB)
-            ret, buffer = cv2.imencode('.jpg', frame)
-            frame = buffer.tobytes()
-        except Exception as e:
-            print(e)
-            continue
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-        # TODO - sleep for duration needed to cap framerate at ~20fps; add timestamp to image (?)
+#camera = Picamera2()
+#camera.configure(camera.create_preview_configuration(main={"format": 'XRGB8888', "size": (1280, 720)}))
+#camera.camera_controls["AwbEnable"] = True
+#camera.start()
+#
+##camera2 = Picamera2()
+##camera2.configure(camera2.create_preview_configuration(main={"device": "/dev/video1", "format": "XRGB8888", "size": (1280, 720)}))
+##camera2.camera_controls["AwbEnable"] = True
+##camera2.start()
+#
+#def generate_frames():
+#    while True:
+#        try:
+#            frame = cv2.cvtColor(camera.capture_array(), cv2.COLOR_BGR2RGB)
+#            ret, buffer = cv2.imencode('.jpg', frame)
+#            frame = buffer.tobytes()
+#        except Exception as e:
+#            print(e)
+#            continue
+#        yield (b'--frame\r\n'
+#               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+#        # TODO - sleep for duration needed to cap framerate at ~20fps; add timestamp to image (?)
 
 from time import sleep
 def generate_cv2frames(dev="/dev/video0"):
@@ -51,9 +51,10 @@ def generate_cv2frames(dev="/dev/video0"):
             continue
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-@app.route('/video')
-def video_feed():
-    return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+#@app.route('/video')
+#def video_feed():
+#    return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/video0')
 def video0_feed():
@@ -246,7 +247,7 @@ except Exception as e:
 
 @app.route('/')
 def root():
-    return redirect('/video', code=307)
+    return redirect('/video0', code=307)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
